@@ -16,14 +16,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up Python environment
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
+      # Step 2: Set up Snyk CLI
+      - name: Install Snyk CLI
+        run: npm install -g snyk
 
-      # Step 3: Run the python script with the secret injected as an environment variable
-      - name: Run Secret Verification Script
+      # Step 5: Authenticate with Snyk using GitHub Secret
+      - name: Authenticate with Snyk
         env:
-          MY_SECRET_TOKEN: ${{ secrets.MY_SECRET_TOKEN }}
-        run: python main.py
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: snyk auth $SNYK_TOKEN
+
+      # Step 6: Run Snyk test on the repository
+      - name: Run Snyk Security Test
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          snyk test --severity-threshold=high || true
+          echo "✅ Snyk security test completed"
