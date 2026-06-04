@@ -1,0 +1,29 @@
+name: GitHub Secrets Demo Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch: # Allows you to manually run this workflow from the Actions tab on GitHub
+
+jobs:
+  run-secret-demo:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Step 3: Run the python script with the secret injected as an environment variable
+      - name: Run Secret Verification Script
+        env:
+          MY_SECRET_TOKEN: ${{ secrets.MY_SECRET_TOKEN }}
+        run: python main.py
